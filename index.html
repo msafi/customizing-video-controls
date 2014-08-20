@@ -61,6 +61,11 @@ angular.module('customVideoControls', [])
 
           $scope.volume = parseInt(video[0].volume * 100)
         },
+
+        play: function() {
+          video[0].play()
+          $scope.playStatus = 'Playing...'
+        }
       })
 
       video.on('progress', function(event) {
