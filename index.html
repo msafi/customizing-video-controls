@@ -12,7 +12,7 @@ angular.module('customVideoControls', [])
   return {
     restrict: 'E',
     templateUrl: 'video.html',
-    link: function($scope, $element, $attributes) {
+    link: function($scope) {
       var video = angular.element(document.querySelector('#video'))
       video[0].volume = 0.5
 
@@ -42,31 +42,25 @@ angular.module('customVideoControls', [])
           video[0].muted = !video[0].muted
         },
 
-        increaseVolume: function() {
+        changeVolume: function(increase) {
           var volume = video[0].volume
-          volume += 0.1
+
+          if (increase) {
+            volume += 0.1
+          } else {
+            volume -= 0.1
+          }
 
           if (volume >= 1) {
-            video[0].volume = 1
-          } else {
-            video[0].volume = volume
+            volume = 1
+          } else if (volume <= 0) {
+            volume = 0
           }
+
+          video[0].volume = volume
 
           $scope.volume = parseInt(video[0].volume * 100)
         },
-
-        decreaseVolume: function() {
-          var volume = video[0].volume
-          volume -= 0.1
-
-          if (volume <= 0) {
-            video[0].volume = 0
-          } else {
-            video[0].volume = volume
-          }
-
-          $scope.volume = parseInt(video[0].volume * 100)
-        }
       })
 
       video.on('progress', function(event) {
