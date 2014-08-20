@@ -1,0 +1,70 @@
+<style>
+  video {
+    width: 500px;
+  }
+</style>
+
+<script src="bower_components/angularjs/angular.min.js"></script>
+<script>
+angular.module('customVideoControls', [])
+
+.directive('amVideo', function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'video.html',
+    link: function($scope, $element, $attributes) {
+      var video = angular.element(document.querySelector('#video'))
+
+      angular.extend($scope, {
+        playStatus: 'Paused',
+
+        muteStatus: 'Un-muted',
+
+        volume: video[0].volume * 100,
+
+        currentPlaybackPosition: video[0].currentTime,
+
+        downloadProgress: 0,
+
+        togglePlay: function() {
+          if (video[0].paused) {
+            $scope.playStatus = 'Playing'
+            video[0].play()
+          } else {
+            $scope.playStatus = 'Paused'
+            video[0].pause()
+          }
+        },
+
+        toggleMute: function() {
+          $scope.muteStatus = (video[0].muted) ? 'Un-muted' : 'Muted'
+          video[0].muted = !video[0].muted
+        },
+
+        decreaseVolume: function() {
+
+        }
+      })
+
+      video.on('progress', function(event) {
+        $scope.$apply(function() {
+          if (event.target.buffered.length > 0) {
+            $scope.downloadProgress = event.target.buffered.end(0) / event.target.duration
+          }
+        })
+      })
+
+      video.on('timeupdate', function() {
+        $scope.$apply(function() {
+          $scope.currentPlaybackPosition = video[0].currentTime
+        })
+      })
+    }
+  }
+})
+
+</script>
+
+<div ng-app="customVideoControls">
+  <am-video></am-video>
+</div>

@@ -1,0 +1,17 @@
+<div>
+  <video src="video.mp4" id="video"></video>
+
+  <div>
+    <button ng-click="togglePlay()">Play / Pause</button>
+    <button ng-click="toggleMute()">Mute / Un-mute</button>
+  </div>
+
+  <div>
+    <p>Video info:</p>
+    <p>Playing: {{playStatus}}</p>
+    <p>Volume: {{volume}}%</p>
+    <p>Mute status: {{muteStatus}}</p>
+    <p>Download progress: {{downloadProgress}}</p>
+    <p>Current playback position: {{currentPlaybackPosition}} second</p>
+  </div>
+</div>
