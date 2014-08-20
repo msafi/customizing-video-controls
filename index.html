@@ -87,6 +87,12 @@ angular.module('customVideoControls', [])
           $scope.currentPlaybackPosition = video[0].currentTime
         })
       })
+
+      video.on('ended', function() {
+        $scope.$apply(function() {
+          $scope.playStatus = 'Ended'
+        })
+      })
     }
   }
 })
