@@ -14,13 +14,14 @@ angular.module('customVideoControls', [])
     templateUrl: 'video.html',
     link: function($scope, $element, $attributes) {
       var video = angular.element(document.querySelector('#video'))
+      video[0].volume = 0.5
 
       angular.extend($scope, {
         playStatus: 'Paused',
 
         muteStatus: 'Un-muted',
 
-        volume: video[0].volume * 100,
+        volume: parseInt(video[0].volume * 100),
 
         currentPlaybackPosition: video[0].currentTime,
 
@@ -41,15 +42,43 @@ angular.module('customVideoControls', [])
           video[0].muted = !video[0].muted
         },
 
-        decreaseVolume: function() {
+        increaseVolume: function() {
+          var volume = video[0].volume
+          volume += 0.1
 
+          if (volume >= 1) {
+            video[0].volume = 1
+          } else {
+            video[0].volume = volume
+          }
+
+          $scope.volume = parseInt(video[0].volume * 100)
+        },
+
+        decreaseVolume: function() {
+          var volume = video[0].volume
+          volume -= 0.1
+
+          if (volume <= 0) {
+            video[0].volume = 0
+          } else {
+            video[0].volume = volume
+          }
+
+          $scope.volume = parseInt(video[0].volume * 100)
         }
       })
 
       video.on('progress', function(event) {
         $scope.$apply(function() {
           if (event.target.buffered.length > 0) {
-            $scope.downloadProgress = event.target.buffered.end(0) / event.target.duration
+            $scope.downloadProgress = event.target.buffered.end(0) / event.target.duration * 100
+
+            $scope.downloadProgress = parseInt($scope.downloadProgress)
+
+            if ($scope.downloadProgress == 99) {
+              $scope.downloadProgress = 100
+            }
           }
         })
       })
