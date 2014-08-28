@@ -1,3 +1,5 @@
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
 <style>
   video {
     width: 500px;
@@ -101,8 +103,96 @@ angular.module('customVideoControls', [])
   }
 })
 
+.controller('Main',
+  function($scope, $http, $q) {
+    $scope.execute = function() {
+      var gameName = $scope.gameName
+      var developerName = $scope.developerName
+
+      $scope.status = 'Searching...'
+
+      $q.all({
+        iphoneSearch: $http(extendDefaultParams({
+          term: getFirst5Chars(gameName),
+          entity: 'software',
+        })),
+
+        ipadSearch: $http(extendDefaultParams({
+          term: getFirst5Chars(gameName),
+          entity: 'iPadSoftware',
+        })),
+
+//        developerSearch: $http(extendDefaultParams({
+//          term: getFirst5Chars(developerName),
+//          attribute: 'softwareDeveloper',
+//        }))
+      }).then(function(results) {
+        var candidates = []
+        var iphoneApps = results.iphoneSearch.data.results
+        var ipadApps = results.ipadSearch.data.results
+        var iphoneAndIpadApps = _.unique(iphoneApps.concat(ipadApps), 'trackId')
+
+        _.each(iphoneAndIpadApps, function(app) {
+          console.log(app.artistName)
+
+          if (_.contains(app.artistName.toLowerCase(), getFirst5Chars(developerName).toLowerCase())) {
+            candidates.push(app.trackName)
+          }
+        })
+
+        if (candidates.length === 0) {
+          candidates.push('No results')
+        }
+
+        $scope.status = ''
+
+        log(candidates)
+      })
+    }
+
+    function releasedWithinTheLast2Days() {
+      return true
+    }
+
+    function log(results) {
+      $scope.results = results
+    }
+
+    function getFirst5Chars(str) {
+      return str.split(' ')[0].substr(0, 5)
+    }
+
+    function extendDefaultParams(params) {
+      var defaults = {
+        method: 'JSONP',
+        url: 'https://itunes.apple.com/search',
+        params: {
+          media: 'software',
+          callback: 'JSON_CALLBACK',
+          limit: '200'
+        }
+      }
+
+      defaults.params = angular.extend(defaults.params, params)
+
+      return defaults
+    }
+
+  }
+)
+
 </script>
 
 <div ng-app="customVideoControls">
-  <am-video></am-video>
+
+  <div ng-controller="Main">
+    <div>Game name: <input type="text" ng-model="gameName"></div>
+    <div>Developer name: <input type="text" ng-model="developerName"></div>
+    <div><button ng-click="execute()">Execute</button> {{status}}</div>
+
+    <pre ng-repeat="result in results">
+      {{result | json}}
+    </pre>
+  </div>
+  <!--<am-video></am-video>-->
 </div>
